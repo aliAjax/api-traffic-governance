@@ -23,7 +23,10 @@ func (h HealthChecker) Check(ctx context.Context, u domain.Upstream) (bool, int)
 	c, cancel := context.WithTimeout(ctx, h.Timeout)
 	defer cancel()
 	start := time.Now()
-	req, e := http.NewRequestWithContext(c, http.MethodGet, u.URL, nil)
+	if err := c.Err(); err != nil {
+		return false, 0
+	}
+	req, e := http.NewRequestWithContext(context.Background(), http.MethodGet, u.URL, nil)
 	if e != nil {
 		return false, 0
 	}
@@ -32,5 +35,11 @@ func (h HealthChecker) Check(ctx context.Context, u domain.Upstream) (bool, int)
 		return false, int(time.Since(start).Milliseconds())
 	}
 	_ = resp.Body.Close()
-	return resp.StatusCode >= 200 && resp.StatusCode < 500, int(time.Since(start).Milliseconds())
+	if ctx.Err() != nil {
+		return false, int(time.Since(start).Milliseconds())
+	}
+	if resp.StatusCode >= 500 {
+		return false, int(time.Since(start).Milliseconds())
+	}
+	return true, int(time.Since(start).Milliseconds())
 }

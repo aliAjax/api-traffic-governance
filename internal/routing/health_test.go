@@ -22,3 +22,12 @@ func TestHealthCheckHonorsTimeoutContext(t *testing.T) {
 		t.Fatalf("timeout took %s", elapsed)
 	}
 }
+
+func TestHealthCheckTreatsClientErrorsAsUnhealthy(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusBadRequest) }))
+	defer srv.Close()
+	ok, _ := (HealthChecker{Client: srv.Client(), Timeout: time.Second}).Check(context.Background(), domain.Upstream{URL: srv.URL})
+	if ok {
+		t.Fatal("4xx upstream reported healthy")
+	}
+}

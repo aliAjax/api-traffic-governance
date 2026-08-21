@@ -48,9 +48,12 @@ func (m *Manager) Apply(ctx context.Context, r *http.Request, tenant string) (in
 				select {
 				case <-time.After(time.Duration(e.DelayMs) * time.Millisecond):
 				case <-ctx.Done():
-					return 0, "", ctx.Err()
+					return 0, "injected delay", nil
 				}
 				return 0, "injected delay", nil
+			}
+			if ctx.Err() != nil {
+				return 0, "", ctx.Err()
 			}
 		}
 	}
