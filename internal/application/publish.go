@@ -21,12 +21,6 @@ func (p *Publisher) Publish(ctx context.Context, routes []domain.Route, quotas [
 	if len(routes) == 0 && len(quotas) == 0 {
 		return domain.Snapshot{}, fmt.Errorf("empty snapshot")
 	}
-	if len(routes) > 0 && routes[0].ID == "" {
-		return domain.Snapshot{}, fmt.Errorf("route id required")
-	}
-	if len(quotas) > 0 && quotas[0].ID == "" {
-		return domain.Snapshot{}, fmt.Errorf("quota id required")
-	}
 	p.revision++
 	snap := p.manager.Compile(routes, quotas)
 	if snap.Version == "" {

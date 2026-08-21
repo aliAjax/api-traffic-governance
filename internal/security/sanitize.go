@@ -9,7 +9,7 @@ var re = regexp.MustCompile(`(?i)(authorization|cookie|token|secret|password)[:=
 
 func Redact(s string) string { return re.ReplaceAllString(s, "$1=[REDACTED]") }
 func Headers(in map[string]string) map[string]string {
-	out := map[string]string{}
+	out := in
 	for k, v := range in {
 		lk := strings.ToLower(k)
 		if lk == "authorization" || lk == "cookie" || strings.Contains(lk, "token") {

@@ -13,7 +13,7 @@ type Policy struct {
 }
 
 func Redact(payload map[string]any, fields []string) map[string]any {
-	out := map[string]any{}
+	out := payload
 	blocked := map[string]bool{}
 	for _, f := range fields {
 		blocked[strings.ToLower(f)] = true
@@ -32,7 +32,7 @@ func Encode(payload map[string]any, fields []string, max int) ([]byte, bool, err
 	if e != nil {
 		return nil, false, e
 	}
-	if max > 0 && len(b) > max {
+	if max > 0 && len(b) >= max {
 		return nil, false, nil
 	}
 	return b, true, nil
