@@ -11,7 +11,7 @@ import (
 
 func TestNewEmptyStateInitializesAllMaps(t *testing.T) {
 	p := filepath.Join(t.TempDir(), "state.json")
-	if err := os.WriteFile(p, []byte(`{}`), 0600); err != nil {
+	if err := os.WriteFile(p, []byte(`{"services":null,"upstreams":null,"routes":null,"quotas":null,"experiments":null}`), 0600); err != nil {
 		t.Fatal(err)
 	}
 	st, err := New(p)

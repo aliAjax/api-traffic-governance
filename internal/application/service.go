@@ -15,6 +15,9 @@ type Service struct {
 
 func New(s *repository.Store) *Service { return &Service{store: s, now: time.Now} }
 func (s *Service) CreateService(c context.Context, v domain.Service) (domain.Service, error) {
+	if s == nil || s.store == nil {
+		return domain.Service{}, domain.ErrUnavailable
+	}
 	if v.ID == "" {
 		v.ID = fmt.Sprintf("svc-%d", s.now().UnixNano())
 	}

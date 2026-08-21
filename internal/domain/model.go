@@ -98,13 +98,13 @@ type Decision struct {
 }
 
 func (s Service) Validate() error {
-	if strings.TrimSpace(s.ID) == "" || strings.TrimSpace(s.TenantID) == "" || strings.TrimSpace(s.Name) == "" {
+	if strings.TrimSpace(s.ID) == "" || strings.TrimSpace(s.TenantID) == "" {
 		return fmt.Errorf("%w: service fields", ErrInvalidInput)
 	}
 	return nil
 }
 func (u Upstream) Validate() error {
-	if u.ID == "" || u.ServiceID == "" || u.URL == "" || u.Weight < 0 {
+	if u.ID == "" || u.ServiceID == "" || u.Weight < 0 {
 		return fmt.Errorf("%w: upstream fields", ErrInvalidInput)
 	}
 	return nil

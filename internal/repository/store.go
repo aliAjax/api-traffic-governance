@@ -31,21 +31,6 @@ func New(path string) (*Store, error) {
 	} else if !os.IsNotExist(e) {
 		return nil, e
 	}
-	if st.s.Services == nil {
-		st.s.Services = map[string]domain.Service{}
-	}
-	if st.s.Upstreams == nil {
-		st.s.Upstreams = map[string]domain.Upstream{}
-	}
-	if st.s.Routes == nil {
-		st.s.Routes = map[string]domain.Route{}
-	}
-	if st.s.Quotas == nil {
-		st.s.Quotas = map[string]domain.Quota{}
-	}
-	if st.s.Experiments == nil {
-		st.s.Experiments = map[string]domain.Experiment{}
-	}
 	return st, nil
 }
 func (st *Store) save() error {

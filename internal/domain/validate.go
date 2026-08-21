@@ -24,6 +24,9 @@ func NormalizePath(v string) string {
 	return v
 }
 func HeaderMatch(headers map[string]string, provided map[string]string) bool {
+	if headers == nil {
+		return true
+	}
 	for k, v := range headers {
 		found := false
 		for pk, pv := range provided {
