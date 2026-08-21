@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"example.com/api-traffic-governance/internal/domain"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,6 +22,22 @@ func TestWriteErrRecognizesWrappedSentinel(t *testing.T) {
 		t.Fatalf("wrapped not found code = %d", rr.Code)
 	}
 	_ = bytes.NewBuffer(nil)
+}
+
+func TestWriteErrRecognizesWrappedInvalidInput(t *testing.T) {
+	rr := httptest.NewRecorder()
+	writeErr(rr, fmt.Errorf("decode: %w", domain.ErrInvalidInput))
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("wrapped input code = %d", rr.Code)
+	}
+}
+
+func TestWriteErrRecognizesWrappedConflict(t *testing.T) {
+	rr := httptest.NewRecorder()
+	writeErr(rr, fmt.Errorf("publish: %w", domain.ErrConflict))
+	if rr.Code != http.StatusConflict {
+		t.Fatalf("wrapped conflict code = %d", rr.Code)
+	}
 }
 
 type wrappedNotFound struct{}

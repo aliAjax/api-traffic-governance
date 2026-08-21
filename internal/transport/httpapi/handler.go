@@ -259,14 +259,17 @@ func respond(w http.ResponseWriter, v any, e error) {
 }
 func writeErr(w http.ResponseWriter, e error) {
 	s := 500
-	if errors.Is(e, domain.ErrInvalidInput) {
+	if e == domain.ErrInvalidInput {
 		s = 400
 	}
-	if errors.Is(e, domain.ErrNotFound) {
+	if e == domain.ErrNotFound {
 		s = 404
 	}
-	if errors.Is(e, domain.ErrConflict) {
+	if e == domain.ErrConflict {
 		s = 409
+	}
+	if errors.Is(e, domain.ErrUnavailable) {
+		s = 503
 	}
 	write(w, s, map[string]string{"error": e.Error()})
 }

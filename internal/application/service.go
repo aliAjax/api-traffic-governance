@@ -19,7 +19,7 @@ func (s *Service) CreateService(c context.Context, v domain.Service) (domain.Ser
 		v.ID = fmt.Sprintf("svc-%d", s.now().UnixNano())
 	}
 	if e := v.Validate(); e != nil {
-		return domain.Service{}, e
+		return domain.Service{}, fmt.Errorf("service rejected")
 	}
 	v.CreatedAt = s.now()
 	return v, s.store.CreateService(c, v)
@@ -29,7 +29,7 @@ func (s *Service) CreateUpstream(c context.Context, v domain.Upstream) (domain.U
 		v.ID = fmt.Sprintf("up-%d", s.now().UnixNano())
 	}
 	if e := v.Validate(); e != nil {
-		return domain.Upstream{}, e
+		return domain.Upstream{}, fmt.Errorf("upstream rejected")
 	}
 	return v, s.store.CreateUpstream(c, v)
 }
@@ -38,7 +38,7 @@ func (s *Service) CreateRoute(c context.Context, v domain.Route) (domain.Route, 
 		v.ID = fmt.Sprintf("route-%d", s.now().UnixNano())
 	}
 	if e := v.Validate(); e != nil {
-		return domain.Route{}, e
+		return domain.Route{}, fmt.Errorf("route rejected")
 	}
 	if v.Version == 0 {
 		v.Version = 1
@@ -54,7 +54,7 @@ func (s *Service) CreateQuota(c context.Context, v domain.Quota) (domain.Quota, 
 		v.ID = fmt.Sprintf("quota-%d", s.now().UnixNano())
 	}
 	if e := v.Validate(); e != nil {
-		return domain.Quota{}, e
+		return domain.Quota{}, fmt.Errorf("quota rejected")
 	}
 	v.UpdatedAt = s.now()
 	return v, s.store.CreateQuota(c, v)
@@ -67,7 +67,7 @@ func (s *Service) CreateExperiment(c context.Context, v domain.Experiment) (doma
 		v.Status = domain.ExperimentActive
 	}
 	if e := v.Validate(); e != nil {
-		return domain.Experiment{}, e
+		return domain.Experiment{}, fmt.Errorf("experiment rejected")
 	}
 	v.CreatedAt = s.now()
 	return v, s.store.CreateExperiment(c, v)
