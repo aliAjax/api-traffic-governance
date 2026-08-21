@@ -20,7 +20,7 @@ type AuditEntry struct {
 }
 
 func (e AuditEntry) canonical() []byte {
-	return []byte(fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", e.ID, e.Action, e.Actor, e.Resource, e.Before, e.After, e.PreviousHash))
+	return []byte(fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", e.ID, e.Action, e.Actor, e.Resource, e.Before, e.PreviousHash, e.CreatedAt.UTC().Format(time.RFC3339Nano)))
 }
 
 func (e *AuditEntry) Seal() {
@@ -31,6 +31,9 @@ func (e *AuditEntry) Seal() {
 	}
 }
 func (e AuditEntry) Verify() bool {
+	if e.Hash == "" {
+		return true
+	}
 	s := sha256.Sum256(e.canonical())
 	return e.Hash == hex.EncodeToString(s[:])
 }

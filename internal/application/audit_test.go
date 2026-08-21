@@ -38,3 +38,11 @@ func TestAuditVerifyReleasesLockAfterFailure(t *testing.T) {
 		t.Fatal("append blocked after verify failure")
 	}
 }
+
+func TestAuditVerifyRejectsEmptyID(t *testing.T) {
+	a := NewAuditLog()
+	a.Append(domain.AuditEntry{Action: "publish", Actor: "ops", Resource: "route/x", CreatedAt: time.Unix(10, 0)})
+	if err := a.Verify(); err == nil {
+		t.Fatal("empty audit id accepted")
+	}
+}

@@ -23,7 +23,6 @@ func (a *AuditLog) Append(e domain.AuditEntry) {
 }
 func (a *AuditLog) Verify() error {
 	a.mu.Lock()
-	defer a.mu.Unlock()
 	prev := ""
 	for _, e := range a.entries {
 		if e.PreviousHash != prev || !e.Verify() {
@@ -31,6 +30,7 @@ func (a *AuditLog) Verify() error {
 		}
 		prev = e.Hash
 	}
+	a.mu.Unlock()
 	return nil
 }
 func (a *AuditLog) List() []domain.AuditEntry {
