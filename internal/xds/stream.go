@@ -28,8 +28,7 @@ func (h *Hub) Subscribe(id string) Subscriber {
 func (h *Hub) Unsubscribe(id string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	if s, ok := h.subs[id]; ok {
-		close(s.Done)
+	if _, ok := h.subs[id]; ok {
 		delete(h.subs, id)
 	}
 }
@@ -44,6 +43,9 @@ func (h *Hub) Publish(s domain.Snapshot) {
 	}
 }
 func (h *Hub) Wait(ctx context.Context, sub Subscriber) (domain.Snapshot, error) {
+	if sub.ID == "" {
+		return domain.Snapshot{}, context.Canceled
+	}
 	select {
 	case s := <-sub.Ch:
 		return s, nil
