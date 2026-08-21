@@ -1,0 +1,7 @@
+services:
+  control-api:
+    build: ..
+    ports: ["8085:8085"]
+    environment: ["TRAFFIC_ADDR=:8085", "TRAFFIC_STATE=/data/state.json"]
+    volumes: ["traffic-data:/data"]
+volumes: {traffic-data: {}}

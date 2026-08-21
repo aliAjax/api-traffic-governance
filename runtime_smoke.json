@@ -1,0 +1,1 @@
+{"mode":"service","start":"go run ./cmd/control-api","ready_url":"http://127.0.0.1:8085/healthz","startup_timeout_seconds":8}

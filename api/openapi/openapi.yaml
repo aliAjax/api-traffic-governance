@@ -1,0 +1,8 @@
+openapi: 3.1.0
+info: {title: API Traffic Governance, version: 1.0.0}
+paths:
+  /healthz: {get: {responses: {"200": {description: healthy}}}}
+  /api/v1/services: {get: {responses: {"200": {description: list}}}, post: {responses: {"201": {description: created}}}}
+  /api/v1/upstreams: {get: {responses: {"200": {description: list}}}, post: {responses: {"201": {description: created}}}}
+  /api/v1/routes: {get: {responses: {"200": {description: list}}}, post: {responses: {"201": {description: created}}}}
+  /api/v1/decision/explain: {post: {responses: {"200": {description: decision}, "429": {description: limited}}}}

@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: traffic-control}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: traffic-control}}
+  template:
+    metadata: {labels: {app: traffic-control}}
+    spec:
+      containers:
+        - name: control-api
+          image: api-traffic-governance:latest
+          ports: [{containerPort: 8085}]
+          readinessProbe: {httpGet: {path: /readyz, port: 8085}}

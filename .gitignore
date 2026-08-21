@@ -1,0 +1,5 @@
+/data/
+*.log
+.env
+.DS_Store
+coverage.out

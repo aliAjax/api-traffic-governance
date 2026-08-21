@@ -1,0 +1,8 @@
+syntax = "proto3";
+package traffic.v1;
+option go_package = "example.com/api-traffic-governance/api/proto;trafficv1";
+service Discovery { rpc Stream(StreamRequest) returns (stream Resource); rpc Ack(AckRequest) returns (AckResponse); }
+message StreamRequest { string client_id = 1; string version = 2; }
+message Resource { string type = 1; string version = 2; bytes payload = 3; string nonce = 4; }
+message AckRequest { string client_id = 1; string version = 2; string nonce = 3; bool accepted = 4; }
+message AckResponse { bool recorded = 1; }
