@@ -20,5 +20,5 @@ func Retryable(status int, err error) bool {
 	}
 	return status == 408 || status == 425 || status == 429 || status >= 500
 }
-func Budget(policy Policy, attempt int) bool { return attempt <= policy.RetryBudget }
+func Budget(policy Policy, attempt int) bool { return attempt < policy.RetryBudget }
 func StatusError(resp *http.Response) bool   { return resp == nil || resp.StatusCode >= 500 }

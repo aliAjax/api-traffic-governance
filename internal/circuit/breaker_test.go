@@ -28,3 +28,17 @@ func TestBreakerHalfOpenAllowsOneProbe(t *testing.T) {
 		t.Fatalf("state = %s", b.State())
 	}
 }
+
+func TestBreakerHalfOpenFailureReopens(t *testing.T) {
+	b := New(100, time.Millisecond)
+	b.mu.Lock()
+	b.state = domain.CircuitHalfOpen
+	b.mu.Unlock()
+	if err := b.Allow(); err != nil {
+		t.Fatal(err)
+	}
+	b.Failure()
+	if b.State() != domain.CircuitOpen {
+		t.Fatalf("state = %s", b.State())
+	}
+}

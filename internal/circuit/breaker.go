@@ -31,9 +31,6 @@ func New(threshold int, cooldown time.Duration) *Breaker {
 func (b *Breaker) Allow() error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	if b.state == domain.CircuitHalfOpen && b.halfInFlight {
-		return ErrOpen
-	}
 	if b.state == domain.CircuitOpen {
 		if time.Since(b.openedAt) < b.cooldown {
 			return ErrOpen
@@ -63,4 +60,4 @@ func (b *Breaker) Failure() {
 		b.openedAt = time.Now()
 	}
 }
-func (b *Breaker) State() domain.State { b.mu.Lock(); defer b.mu.Unlock(); return b.state }
+func (b *Breaker) State() domain.State { return b.state }
