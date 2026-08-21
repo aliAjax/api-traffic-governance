@@ -6,7 +6,7 @@ import (
 )
 
 func Expired(items []Message, now time.Time) []Message {
-	out := items[:0]
+	out := make([]Message, 0, len(items))
 	for _, v := range items {
 		if !v.ExpiresAt.IsZero() && v.ExpiresAt.Before(now) {
 			out = append(out, v)

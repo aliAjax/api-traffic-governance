@@ -13,19 +13,38 @@ type Policy struct {
 }
 
 func Redact(payload map[string]any, fields []string) map[string]any {
-	out := payload
 	blocked := map[string]bool{}
 	for _, f := range fields {
 		blocked[strings.ToLower(f)] = true
 	}
+	out := make(map[string]any, len(payload))
 	for k, v := range payload {
 		if blocked[strings.ToLower(k)] {
 			out[k] = "[REDACTED]"
 		} else {
-			out[k] = v
+			out[k] = deepCopy(v)
 		}
 	}
 	return out
+}
+
+func deepCopy(v any) any {
+	switch val := v.(type) {
+	case map[string]any:
+		cp := make(map[string]any, len(val))
+		for k, vv := range val {
+			cp[k] = deepCopy(vv)
+		}
+		return cp
+	case []any:
+		cp := make([]any, len(val))
+		for i, vv := range val {
+			cp[i] = deepCopy(vv)
+		}
+		return cp
+	default:
+		return v
+	}
 }
 func Encode(payload map[string]any, fields []string, max int) ([]byte, bool, error) {
 	b, e := json.Marshal(Redact(payload, fields))
