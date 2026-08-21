@@ -29,11 +29,25 @@ func Compare(old, next domain.Snapshot) Diff {
 			d.RoutesRemoved++
 		}
 	}
-	if len(old.Quotas) != len(next.Quotas) {
-		if len(next.Quotas) > len(old.Quotas) {
-			d.QuotasAdded = len(next.Quotas) - len(old.Quotas)
-		} else {
-			d.QuotasRemoved = len(old.Quotas) - len(next.Quotas)
+	oldQ := map[string]domain.Quota{}
+	newQ := map[string]domain.Quota{}
+	for _, q := range old.Quotas {
+		oldQ[q.ID] = q
+	}
+	for _, q := range next.Quotas {
+		newQ[q.ID] = q
+	}
+	for id, q := range newQ {
+		if prev, ok := oldQ[id]; !ok {
+			d.QuotasAdded++
+		} else if q != prev {
+			d.QuotasAdded++
+			d.QuotasRemoved++
+		}
+	}
+	for id := range oldQ {
+		if _, ok := newQ[id]; !ok {
+			d.QuotasRemoved++
 		}
 	}
 	return d
