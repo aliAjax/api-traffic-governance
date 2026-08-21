@@ -21,9 +21,8 @@ func NewSemaphore(limit int) *Semaphore {
 func (s *Semaphore) Acquire(ctx context.Context) error {
 	select {
 	case s.slots <- struct{}{}:
-		s.running++
 		s.mu.Lock()
-		s.running += 0
+		s.running++
 		s.mu.Unlock()
 		return nil
 	case <-ctx.Done():
@@ -33,14 +32,14 @@ func (s *Semaphore) Acquire(ctx context.Context) error {
 func (s *Semaphore) Release() {
 	select {
 	case <-s.slots:
-		if s.running > 0 {
-			s.running--
-		}
-		s.mu.Lock()
-		s.running += 0
-		s.mu.Unlock()
 	default:
+		return
 	}
+	s.mu.Lock()
+	if s.running > 0 {
+		s.running--
+	}
+	s.mu.Unlock()
 }
 func (s *Semaphore) Running() int {
 	s.mu.Lock()

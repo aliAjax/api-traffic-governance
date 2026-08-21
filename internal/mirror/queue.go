@@ -31,11 +31,11 @@ func (q *Queue) Push(m Message) error {
 	if m.ID == "" || m.TenantID == "" {
 		return fmt.Errorf("message identity required")
 	}
+	q.mu.Lock()
+	defer q.mu.Unlock()
 	if len(q.items) >= q.max {
 		return fmt.Errorf("mirror queue full")
 	}
-	q.mu.Lock()
-	defer q.mu.Unlock()
 	q.items = append(q.items, m)
 	return nil
 }
@@ -56,4 +56,8 @@ func (q *Queue) Pop(ctx context.Context) (Message, error) {
 		}
 	}
 }
-func (q *Queue) Len() int { return len(q.items) }
+func (q *Queue) Len() int {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	return len(q.items)
+}
