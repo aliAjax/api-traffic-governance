@@ -35,10 +35,12 @@ func (b *Breaker) Allow() error {
 		if time.Since(b.openedAt) < b.cooldown {
 			return ErrOpen
 		}
+		b.state = domain.CircuitHalfOpen
+	}
+	if b.state == domain.CircuitHalfOpen {
 		if b.halfInFlight {
 			return ErrOpen
 		}
-		b.state = domain.CircuitHalfOpen
 		b.halfInFlight = true
 	}
 	return nil
@@ -53,6 +55,13 @@ func (b *Breaker) Success() {
 func (b *Breaker) Failure() {
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	if b.state == domain.CircuitHalfOpen {
+		b.failures = 1
+		b.halfInFlight = false
+		b.state = domain.CircuitOpen
+		b.openedAt = time.Now()
+		return
+	}
 	b.failures++
 	b.halfInFlight = false
 	if b.failures >= b.threshold {
@@ -60,4 +69,8 @@ func (b *Breaker) Failure() {
 		b.openedAt = time.Now()
 	}
 }
-func (b *Breaker) State() domain.State { return b.state }
+func (b *Breaker) State() domain.State {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.state
+}
