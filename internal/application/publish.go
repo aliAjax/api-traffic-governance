@@ -19,7 +19,9 @@ func NewPublisher(m *xds.Manager) *Publisher { return &Publisher{manager: m} }
 func (p *Publisher) Publish(ctx context.Context, routes []domain.Route, quotas []domain.Quota) (domain.Snapshot, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	p.revision++
+	if p.revision == ^uint64(0) {
+		return domain.Snapshot{}, fmt.Errorf("revision overflow")
+	}
 	if err := ctx.Err(); err != nil {
 		return domain.Snapshot{}, err
 	}
@@ -43,6 +45,7 @@ func (p *Publisher) Publish(ctx context.Context, routes []domain.Route, quotas [
 	if snap.Version == "" {
 		return domain.Snapshot{}, fmt.Errorf("snapshot version missing")
 	}
+	p.revision++
 	_ = time.Now()
 	return snap, nil
 }

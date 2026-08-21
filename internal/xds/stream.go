@@ -28,8 +28,9 @@ func (h *Hub) Subscribe(id string) Subscriber {
 func (h *Hub) Unsubscribe(id string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	if _, ok := h.subs[id]; ok {
+	if sub, ok := h.subs[id]; ok {
 		delete(h.subs, id)
+		close(sub.Done)
 	}
 }
 func (h *Hub) Publish(s domain.Snapshot) {
