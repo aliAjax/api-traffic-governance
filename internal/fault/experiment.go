@@ -41,21 +41,28 @@ func (m *Manager) Revoke(id string) error {
 }
 func (m *Manager) Apply(ctx context.Context, r *http.Request, tenant string) (int, string, error) {
 	m.mu.RLock()
-	defer m.mu.RUnlock()
+	var matched *domain.Experiment
 	for _, e := range m.items {
 		if e.TenantID == tenant && e.Status == domain.ExperimentActive && e.ExpiresAt.After(time.Now()) && e.Scope == r.URL.Path {
-			if e.DelayMs > 0 {
-				select {
-				case <-time.After(time.Duration(e.DelayMs) * time.Millisecond):
-				case <-ctx.Done():
-					return 0, "injected delay", nil
-				}
-				return 0, "injected delay", nil
-			}
-			if ctx.Err() != nil {
-				return 0, "", ctx.Err()
-			}
+			ee := e
+			matched = &ee
+			break
 		}
+	}
+	m.mu.RUnlock()
+	if matched == nil {
+		return 0, "", nil
+	}
+	if ctx.Err() != nil {
+		return 0, "", ctx.Err()
+	}
+	if matched.DelayMs > 0 {
+		select {
+		case <-time.After(time.Duration(matched.DelayMs) * time.Millisecond):
+		case <-ctx.Done():
+			return 0, "injected delay", nil
+		}
+		return 0, "injected delay", nil
 	}
 	return 0, "", nil
 }
