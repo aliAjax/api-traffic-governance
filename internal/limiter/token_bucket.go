@@ -1,10 +1,13 @@
 package limiter
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 )
+
+var ErrWaitExceeded = errors.New("rate limit wait exceeded")
 
 type Bucket struct {
 	mu       sync.Mutex
@@ -42,13 +45,16 @@ func (b *Bucket) Allow(n int) bool {
 	return true
 }
 func (b *Bucket) Wait(n int, max time.Duration) error {
+	if max <= 0 {
+		max = 50 * time.Millisecond
+	}
 	start := time.Now()
 	for {
 		if b.Allow(n) {
 			return nil
 		}
 		if time.Since(start) >= max {
-			return fmt.Errorf("rate limit wait exceeded")
+			return fmt.Errorf("%w after %s", ErrWaitExceeded, max)
 		}
 		time.Sleep(2 * time.Millisecond)
 	}
