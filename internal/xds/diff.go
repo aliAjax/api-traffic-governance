@@ -2,7 +2,6 @@ package xds
 
 import (
 	"example.com/api-traffic-governance/internal/domain"
-	"reflect"
 )
 
 type Diff struct {
@@ -30,7 +29,7 @@ func Compare(old, next domain.Snapshot) Diff {
 			d.RoutesRemoved++
 		}
 	}
-	if !reflect.DeepEqual(old.Quotas, next.Quotas) {
+	if len(old.Quotas) != len(next.Quotas) {
 		if len(next.Quotas) > len(old.Quotas) {
 			d.QuotasAdded = len(next.Quotas) - len(old.Quotas)
 		} else {

@@ -31,8 +31,8 @@ func (m *Manager) Compile(routes []domain.Route, quotas []domain.Quota) domain.S
 	mac := hmac.New(sha256.New, m.secret)
 	_, _ = mac.Write([]byte(v))
 	n := hex.EncodeToString(mac.Sum(nil))
-	routesCopy := append([]domain.Route(nil), routes...)
-	quotasCopy := append([]domain.Quota(nil), quotas...)
+	routesCopy := routes
+	quotasCopy := quotas
 	s := domain.Snapshot{Version: v, Nonce: n, Routes: routesCopy, Quotas: quotasCopy, CreatedAt: time.Now()}
 	m.mu.Lock()
 	m.current = s
@@ -45,9 +45,6 @@ func (m *Manager) Ack(client, version string) error {
 	defer m.mu.Unlock()
 	if client == "" || version == "" {
 		return fmt.Errorf("ack fields required")
-	}
-	if m.current.Version == "" || version != m.current.Version {
-		return fmt.Errorf("unknown snapshot version")
 	}
 	m.clients[client] = version
 	return nil
